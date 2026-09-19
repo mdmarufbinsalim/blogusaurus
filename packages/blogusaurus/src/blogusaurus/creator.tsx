@@ -7,13 +7,17 @@ import {
   CheckIcon,
   EyeIcon,
   ImageIcon,
+  LinkIcon,
   Loader2Icon,
   PencilIcon,
+  TagIcon,
   XIcon,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Editor, EditorContainer } from '@/components/ui/editor';
+import { FixedToolbar } from '@/components/ui/fixed-toolbar';
+import { FixedToolbarButtons } from '@/components/ui/fixed-toolbar-buttons';
 import { Input } from '@/components/ui/input';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from 'sonner';
@@ -104,7 +108,7 @@ function ThemeRoot({
     <div
       {...attrs}
       ref={setRoot}
-      className={cn(rootClass, 'bsk-surface', className)}
+      className={cn(rootClass, 'bsk-surface bsk-fill', className)}
       style={style}
     >
       <PortalContainerProvider value={root ?? undefined}>
@@ -224,121 +228,148 @@ function CreatorInner({
   }, [post, saveState, autosaveDelay, persist]);
 
   const words = countWords(content);
+  const editing = view === 'edit';
 
   return (
-    <div className="flex min-h-full flex-col [&_[role=toolbar].sticky]:top-[57px]">
-      <header className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b bg-background/95 px-4 py-3 backdrop-blur-sm">
-        <SaveStatus state={saveState} savedAt={savedAt} published={status === 'published'} />
-
-        <div className="flex items-center gap-2">
-          <div className="flex rounded-md border p-0.5">
-            <Button
-              size="sm"
-              variant={view === 'edit' ? 'secondary' : 'ghost'}
-              onClick={() => setView('edit')}
-            >
-              <PencilIcon /> Edit
-            </Button>
-            <Button
-              size="sm"
-              variant={view === 'preview' ? 'secondary' : 'ghost'}
-              onClick={() => setView('preview')}
-            >
-              <EyeIcon /> Preview
-            </Button>
-          </div>
-          {hasSave && (
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={saveState === 'saving'}
-              onClick={() => void persist(post, false)}
-            >
-              Save draft
-            </Button>
-          )}
-          {hasPublish && (
-            <Button
-              size="sm"
-              disabled={saveState === 'saving' || !post.title}
-              onClick={() => void persist({ ...post, status: 'published' }, true)}
-            >
-              {status === 'published' ? 'Update' : 'Publish'}
-            </Button>
-          )}
-        </div>
-      </header>
-
-      {/* Both views stay mounted so editor state (undo history, selection) survives toggling. */}
-      <div className={cn(view === 'preview' && 'hidden')}>
-        <div className="mx-auto w-full max-w-3xl space-y-4 px-4 pt-8">
-          {show.cover && (
-            <CoverField cover={cover} onChange={setCover} canUpload={hasUpload} />
-          )}
-          <textarea
-            value={title}
-            rows={1}
-            placeholder="Title"
-            aria-label="Title"
-            onChange={(e) => {
-              setTitle(e.target.value);
-              if (!slugTouched) setSlug(slugify(e.target.value));
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') e.preventDefault();
-            }}
-            className="field-sizing-content w-full resize-none overflow-hidden bg-transparent font-bold text-4xl tracking-tight outline-none placeholder:text-muted-foreground/50"
-          />
-          {show.excerpt && (
-            <textarea
-              value={excerpt}
-              rows={1}
-              placeholder="Short summary (used in listings and meta description)"
-              aria-label="Excerpt"
-              onChange={(e) => setExcerpt(e.target.value)}
-              className="field-sizing-content w-full resize-none overflow-hidden bg-transparent text-lg text-muted-foreground outline-none placeholder:text-muted-foreground/50"
+    <Plate editor={editor} onValueChange={({ value }) => setContent(value)}>
+      {/* Fills whatever height the host gives it and scrolls internally; with no
+          fixed height it simply grows and the bar sticks to the page instead. */}
+      <div className="flex h-full min-h-0 flex-col">
+        <div className="sticky top-0 z-40 shrink-0 border-b bg-background/95 backdrop-blur-sm">
+          <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2.5">
+            <SaveStatus
+              state={saveState}
+              savedAt={savedAt}
+              published={status === 'published'}
             />
-          )}
-          {show.tags && <TagsField tags={tags} onChange={setTags} />}
-          {show.slug && (
-            <div className="flex items-center gap-2 text-muted-foreground text-sm">
-              <span>/</span>
-              <Input
-                value={slug}
-                aria-label="Slug"
-                placeholder="post-slug"
-                onChange={(e) => {
-                  setSlugTouched(true);
-                  setSlug(slugify(e.target.value));
-                }}
-                className="h-7 max-w-xs"
-              />
+
+            <div className="flex items-center gap-2">
+              <div className="flex rounded-lg border bg-muted/50 p-0.5">
+                <Button
+                  size="sm"
+                  variant={editing ? 'secondary' : 'ghost'}
+                  className={cn(editing && 'bg-background shadow-sm')}
+                  onClick={() => setView('edit')}
+                >
+                  <PencilIcon /> Edit
+                </Button>
+                <Button
+                  size="sm"
+                  variant={!editing ? 'secondary' : 'ghost'}
+                  className={cn(!editing && 'bg-background shadow-sm')}
+                  onClick={() => setView('preview')}
+                >
+                  <EyeIcon /> Preview
+                </Button>
+              </div>
+              {hasSave && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={saveState === 'saving'}
+                  onClick={() => void persist(post, false)}
+                >
+                  Save draft
+                </Button>
+              )}
+              {hasPublish && (
+                <Button
+                  size="sm"
+                  disabled={saveState === 'saving' || !post.title}
+                  onClick={() =>
+                    void persist({ ...post, status: 'published' }, true)
+                  }
+                >
+                  {status === 'published' ? 'Update' : 'Publish'}
+                </Button>
+              )}
             </div>
-          )}
+          </header>
+
+          <div className={cn(!editing && 'hidden')}>
+            <FixedToolbar className="static rounded-none border-t border-b-0 bg-transparent px-3 py-1.5 backdrop-blur-none">
+              <FixedToolbarButtons />
+            </FixedToolbar>
+          </div>
         </div>
 
-        <div className="mx-auto mt-6 w-full max-w-4xl px-2">
-          <Plate
-            editor={editor}
-            onValueChange={({ value }) => setContent(value)}
-          >
-            <EditorContainer className="h-auto overflow-visible">
-              <Editor
-                variant="none"
-                placeholder={placeholder}
-                className="min-h-[420px] px-6 pt-4 pb-40 text-base"
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {/* Both views stay mounted so editor state (undo history, selection) survives toggling. */}
+          <div className={cn(!editing && 'hidden')}>
+            <div className="mx-auto w-full max-w-3xl px-6 pt-10 sm:px-12">
+              {show.cover && (
+                <CoverField
+                  cover={cover}
+                  onChange={setCover}
+                  canUpload={hasUpload}
+                />
+              )}
+              <textarea
+                value={title}
+                rows={1}
+                placeholder="Title"
+                aria-label="Title"
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  if (!slugTouched) setSlug(slugify(e.target.value));
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') e.preventDefault();
+                }}
+                className="field-sizing-content mt-2 block w-full resize-none overflow-hidden bg-transparent font-bold text-4xl leading-tight tracking-tight outline-none placeholder:text-muted-foreground/40"
               />
-            </EditorContainer>
-          </Plate>
+              {show.excerpt && (
+                <textarea
+                  value={excerpt}
+                  rows={1}
+                  placeholder="Add a short summary…"
+                  aria-label="Excerpt"
+                  onChange={(e) => setExcerpt(e.target.value)}
+                  className="field-sizing-content mt-3 block w-full resize-none overflow-hidden bg-transparent text-lg text-muted-foreground leading-relaxed outline-none placeholder:text-muted-foreground/40"
+                />
+              )}
+              {(show.tags || show.slug) && (
+                <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 border-b pb-4 text-sm">
+                  {show.tags && <TagsField tags={tags} onChange={setTags} />}
+                  {show.slug && (
+                    <label className="flex items-center gap-1 text-muted-foreground">
+                      <span className="font-mono text-xs">/</span>
+                      <input
+                        value={slug}
+                        aria-label="Slug"
+                        placeholder="post-slug"
+                        onChange={(e) => {
+                          setSlugTouched(true);
+                          setSlug(slugify(e.target.value));
+                        }}
+                        className="w-44 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground/40"
+                      />
+                    </label>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="mx-auto w-full max-w-3xl px-6 sm:px-12">
+              <EditorContainer className="h-auto overflow-visible">
+                <Editor
+                  variant="none"
+                  placeholder={placeholder}
+                  className="min-h-[320px] px-0 pt-6 pb-40 text-base"
+                />
+              </EditorContainer>
+            </div>
+          </div>
+
+          {!editing && <BlogusaurusRender post={post} theme={theme} />}
         </div>
+
+        <footer className="shrink-0 border-t px-4 py-1.5 text-muted-foreground text-xs">
+          {words} {words === 1 ? 'word' : 'words'} · {readingTime(content)} min
+          read
+        </footer>
       </div>
-
-      {view === 'preview' && <BlogusaurusRender post={post} theme={theme} />}
-
-      <footer className="mt-auto border-t px-4 py-2 text-muted-foreground text-xs">
-        {words} {words === 1 ? 'word' : 'words'} · {readingTime(content)} min read
-      </footer>
-    </div>
+    </Plate>
   );
 }
 
@@ -352,23 +383,36 @@ function SaveStatus({
   published: boolean;
 }) {
   return (
-    <div className="flex items-center gap-2 text-muted-foreground text-sm" aria-live="polite">
-      <span className="rounded-full bg-muted px-2 py-0.5 text-foreground text-xs">
+    <div
+      className="flex items-center gap-2 text-muted-foreground text-sm"
+      aria-live="polite"
+    >
+      <span
+        className={cn(
+          'rounded-full px-2 py-0.5 font-medium text-xs',
+          published
+            ? 'bg-brand/15 text-brand'
+            : 'bg-muted text-muted-foreground'
+        )}
+      >
         {published ? 'Published' : 'Draft'}
       </span>
       {state === 'saving' && (
-        <>
+        <span className="flex items-center gap-1.5">
           <Loader2Icon className="size-3.5 animate-spin" /> Saving…
-        </>
+        </span>
       )}
       {state === 'saved' && (
-        <>
-          <CheckIcon className="size-3.5" /> Saved{' '}
-          {savedAt?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </>
+        <span className="flex items-center gap-1.5">
+          <CheckIcon className="size-3.5" /> Saved
+          {savedAt &&
+            ` ${savedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+        </span>
       )}
-      {state === 'dirty' && 'Unsaved changes'}
-      {state === 'error' && <span className="text-destructive">Save failed</span>}
+      {state === 'dirty' && <span>Unsaved changes</span>}
+      {state === 'error' && (
+        <span className="text-destructive">Save failed</span>
+      )}
     </div>
   );
 }
@@ -385,12 +429,16 @@ function CoverField({
   const { onUploadFile, onError } = useBlogusaurusHandlers();
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [busy, setBusy] = React.useState(false);
+  const [urlOpen, setUrlOpen] = React.useState(false);
   const [url, setUrl] = React.useState('');
 
   async function upload(file: File) {
     setBusy(true);
     try {
-      const res = await onUploadFile!(file, { kind: 'cover', onProgress: () => {} });
+      const res = await onUploadFile!(file, {
+        kind: 'cover',
+        onProgress: () => {},
+      });
       onChange({ url: res.url, alt: cover?.alt });
     } catch (error) {
       onError?.(error);
@@ -406,13 +454,13 @@ function CoverField({
         <img
           src={cover.url}
           alt={cover.alt ?? ''}
-          className="aspect-[2/1] w-full rounded-xl object-cover"
+          className="aspect-[2/1] w-full rounded-xl border object-cover"
         />
         <Button
           size="icon-sm"
           variant="secondary"
           aria-label="Remove cover image"
-          className="absolute top-2 right-2 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+          className="absolute top-3 right-3 opacity-0 shadow-sm transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
           onClick={() => onChange(undefined)}
         >
           <XIcon />
@@ -422,43 +470,60 @@ function CoverField({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 text-muted-foreground text-sm">
-      {canUpload && (
-        <>
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) void upload(file);
-              e.target.value = '';
-            }}
-          />
-          <Button
-            size="sm"
-            variant="ghost"
-            disabled={busy}
-            onClick={() => inputRef.current?.click()}
-          >
-            {busy ? <Loader2Icon className="animate-spin" /> : <ImageIcon />} Add cover image
-          </Button>
-        </>
-      )}
-      <Input
-        value={url}
-        placeholder="or paste an image URL"
-        aria-label="Cover image URL"
-        onChange={(e) => setUrl(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && url.trim()) {
+    <div>
+      <div className="-ml-2 flex items-center gap-1 text-muted-foreground">
+        {canUpload && (
+          <>
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void upload(file);
+                e.target.value = '';
+              }}
+            />
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={busy}
+              onClick={() => inputRef.current?.click()}
+            >
+              {busy ? <Loader2Icon className="animate-spin" /> : <ImageIcon />}
+              Add cover
+            </Button>
+          </>
+        )}
+        <Button size="sm" variant="ghost" onClick={() => setUrlOpen((o) => !o)}>
+          <LinkIcon /> Cover from URL
+        </Button>
+      </div>
+      {urlOpen && (
+        <form
+          className="mt-1 flex items-center gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!url.trim()) return;
             onChange({ url: url.trim() });
             setUrl('');
-          }
-        }}
-        className="h-8 max-w-xs"
-      />
+            setUrlOpen(false);
+          }}
+        >
+          <Input
+            autoFocus
+            value={url}
+            placeholder="https://…/image.jpg"
+            aria-label="Cover image URL"
+            onChange={(e) => setUrl(e.target.value)}
+            className="h-8"
+          />
+          <Button size="sm" type="submit">
+            Add
+          </Button>
+        </form>
+      )}
     </div>
   );
 }
@@ -479,7 +544,8 @@ function TagsField({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex min-w-48 flex-1 flex-wrap items-center gap-2">
+      <TagIcon className="size-4 text-muted-foreground" />
       {tags.map((tag) => (
         <span
           key={tag}
@@ -498,7 +564,7 @@ function TagsField({
       ))}
       <input
         value={draft}
-        placeholder={tags.length ? 'Add tag' : 'Add tags (press Enter)'}
+        placeholder={tags.length ? 'Add tag' : 'Add tags…'}
         aria-label="Add tag"
         onChange={(e) => setDraft(e.target.value)}
         onBlur={commit}
@@ -510,7 +576,7 @@ function TagsField({
             onChange(tags.slice(0, -1));
           }
         }}
-        className="min-w-32 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/50"
+        className="min-w-24 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/50"
       />
     </div>
   );

@@ -72,3 +72,7 @@
   background-color: var(--bsk-background);
   color: var(--bsk-foreground);
 }
+/* The creator fills the height its host gives it and scrolls internally. */
+.bsk-root.bsk-fill {
+  height: 100%;
+}
