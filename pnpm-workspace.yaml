@@ -7,3 +7,6 @@ allowBuilds:
   msgpackr-extract: true
   unrs-resolver: true
   sharp: true
+
+minimumReleaseAgeExclude:
+  - blogusaurus@0.1.0
