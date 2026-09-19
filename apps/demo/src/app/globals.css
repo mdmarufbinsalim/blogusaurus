@@ -1,0 +1,57 @@
+/* Demo chrome only. Deliberately plain CSS: no Tailwind, no shadcn, no tokens.
+   Everything the editor needs comes from `blogusaurus/styles.css`. */
+:root {
+  --bg: #fafafa;
+  --fg: #171717;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --surface: #ffffff;
+}
+html.dark {
+  --bg: #0a0a0a;
+  --fg: #ededed;
+  --muted: #9ca3af;
+  --line: #27272a;
+  --surface: #171717;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.demo-bar { border-bottom: 1px solid var(--line); background: var(--surface); padding: 12px 16px; }
+.demo-bar-inner { max-width: 1152px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.demo-brand { display: flex; align-items: center; gap: 24px; }
+.demo-brand h1 { margin: 0; font-size: 16px; font-weight: 600; }
+.demo-nav { display: flex; gap: 4px; }
+.demo-nav button, .demo-nav a {
+  border: 0; border-radius: 6px; background: none; color: var(--muted); cursor: pointer;
+  padding: 6px 12px; font: inherit; font-size: 14px; text-decoration: none;
+}
+.demo-nav button[aria-current="page"] { background: var(--bg); color: var(--fg); font-weight: 500; box-shadow: 0 0 0 1px var(--line); }
+.demo-nav button:hover, .demo-nav a:hover { color: var(--fg); }
+
+.demo-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+.demo-controls label { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.demo-controls select {
+  border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--fg);
+  padding: 4px 8px; font: inherit; font-size: 14px;
+}
+.demo-controls input[type="color"] { width: 36px; height: 28px; padding: 0; border: 1px solid var(--line); border-radius: 4px; background: none; cursor: pointer; }
+.demo-link { border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; }
+
+.demo-empty { max-width: 28rem; margin: 0 auto; padding: 96px 16px; text-align: center; color: var(--muted); }
+.demo-data { max-width: 56rem; margin: 0 auto; padding: 32px 16px; }
+.demo-data-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.demo-seg { display: flex; gap: 4px; border: 1px solid var(--line); border-radius: 6px; padding: 2px; }
+.demo-seg button { border: 0; border-radius: 4px; background: none; color: var(--muted); padding: 4px 12px; font: inherit; font-size: 14px; text-transform: capitalize; cursor: pointer; }
+.demo-seg button[aria-pressed="true"] { background: var(--bg); color: var(--fg); font-weight: 500; }
+.demo-data pre { max-height: 70vh; overflow: auto; margin: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 12px; }
+.demo-danger { color: #dc2626; }
+
+.demo-ssr { max-width: 56rem; margin: 0 auto; padding: 32px 16px; }
+.demo-ssr > p { color: var(--muted); font-size: 14px; }

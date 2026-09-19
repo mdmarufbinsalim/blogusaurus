@@ -1,0 +1,74 @@
+/*
+ * Package stylesheet source. Compiled by scripts/build-css.mjs, which injects
+ * the token rules and theme map at the markers below and scopes every rule
+ * under `.bsk-root`.
+ */
+@import "tailwindcss" source(none);
+@source "../";
+@plugin "tailwind-scrollbar-hide";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "katex/dist/katex.min.css";
+
+/* dark: follows the theme mode (see tokens in scripts/build-css.mjs) */
+@custom-variant dark {
+  &:where([data-bsk-theme="dark"] *, .dark [data-bsk-theme="inherit"] *, [data-theme="dark"] [data-bsk-theme="inherit"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where([data-bsk-theme="system"] *) {
+      @slot;
+    }
+  }
+}
+
+@theme inline {
+  /*__THEME_MAP__*/
+  --font-mono: var(--bsk-c-font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  --radius-sm: calc(var(--bsk-radius) * 0.6);
+  --radius-md: calc(var(--bsk-radius) * 0.8);
+  --radius-lg: var(--bsk-radius);
+  --radius-xl: calc(var(--bsk-radius) * 1.4);
+  --radius-2xl: calc(var(--bsk-radius) * 1.8);
+  --radius-3xl: calc(var(--bsk-radius) * 2.2);
+  --radius-4xl: calc(var(--bsk-radius) * 2.6);
+}
+
+/*__TOKENS__*/
+
+/* Vendored code reads `--radius`, `--secondary`, `--foreground` etc. directly. */
+.bsk-root {
+  --radius: var(--bsk-radius);
+  --background: var(--bsk-background);
+  --foreground: var(--bsk-foreground);
+  --secondary: var(--bsk-secondary);
+  --primary: var(--bsk-primary);
+  --muted: var(--bsk-muted);
+  --border: var(--bsk-border);
+  --input: var(--bsk-input);
+  --ring: var(--bsk-ring);
+  --destructive: var(--bsk-destructive);
+  --accent: var(--bsk-accent);
+  --brand: var(--bsk-brand);
+  --highlight: var(--bsk-highlight);
+  font-family: var(--bsk-c-font, inherit);
+}
+
+/* Default border/outline colors (shadcn's `* { border-border outline-ring/50 }`), scoped. */
+.bsk-root,
+.bsk-root * {
+  border-color: var(--bsk-border);
+  outline-color: color-mix(in oklab, var(--bsk-ring) 50%, transparent);
+}
+
+/*
+ * Every utility is scoped as `.bsk-root .x`, so utilities placed ON the root
+ * element never match. Anything the root itself needs lives here instead.
+ * `bsk-surface` = an opaque themed surface (the creator, or a forced mode);
+ * without it the root is transparent and inherits the host's color.
+ */
+.bsk-root.bsk-surface {
+  position: relative;
+  background-color: var(--bsk-background);
+  color: var(--bsk-foreground);
+}
