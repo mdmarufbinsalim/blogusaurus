@@ -80,6 +80,9 @@ importers:
       '@platejs/dnd':
         specifier: ^53.3.8
         version: 53.3.8(platejs@53.3.11(@types/react@19.3.0)(immer@10.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)(use-sync-external-store@1.7.0(react@19.2.8)))(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/node@20.19.43)(@types/react@19.3.0)(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@platejs/docx':
+        specifier: ^53.0.0
+        version: 53.0.0(platejs@53.3.11(@types/react@19.3.0)(immer@10.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)(use-sync-external-store@1.7.0(react@19.2.8)))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@platejs/docx-io':
         specifier: ^53.3.10
         version: 53.3.10(@platejs/docx@53.0.0(platejs@53.3.11(@types/react@19.3.0)(immer@10.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)(use-sync-external-store@1.7.0(react@19.2.8)))(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@platejs/markdown@53.3.12(platejs@53.3.11(@types/react@19.3.0)(immer@10.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)(use-sync-external-store@1.7.0(react@19.2.8)))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3))(platejs@53.3.11(@types/react@19.3.0)(immer@10.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)(use-sync-external-store@1.7.0(react@19.2.8)))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -206,6 +209,9 @@ importers:
       sonner:
         specifier: ^2.0.8
         version: 2.0.8(@types/react@19.3.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      tailwind-merge:
+        specifier: ^3.7.0
+        version: 3.7.0
       use-file-picker:
         specifier: ^2.1.2
         version: 2.1.4(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react@19.2.8)
