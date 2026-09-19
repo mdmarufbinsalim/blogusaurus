@@ -4,7 +4,7 @@
   "packageManager": "pnpm@11.8.0",
   "scripts": {
     "dev": "pnpm -r --parallel --filter blogusaurus --filter demo dev",
-    "build": "pnpm --filter blogusaurus build && pnpm --filter demo build",
+    "build": "pnpm --filter demo build",
     "build:pkg": "pnpm --filter blogusaurus build",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint"
