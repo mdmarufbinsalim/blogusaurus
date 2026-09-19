@@ -13,6 +13,15 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Vendored shadcn/Plate registry code: we own it, but keep it close to upstream.
+  {
+    files: ["src/components/ui/**", "src/components/editor/**", "src/hooks/**"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@next/next/no-img-element": "off",
+      "react/display-name": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
